@@ -1,0 +1,9 @@
+development: &development
+ facebook_api_key: <%= ENV['facebook_api_key'] %>
+ facebook_secret_key: <%= ENV['facebook_secret_key'] %>
+
+test:
+ <<: *development
+
+production:
+ <<: *development
