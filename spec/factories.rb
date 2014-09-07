@@ -5,7 +5,11 @@ FactoryGirl.define do
     sequence(:franchise) { |n| "franchise-#{n}" }
     sequence(:price) { |n| '3000' }
     sequence(:points) { |n| 1000 }
-    sequence(:role) { |n| 'forward striker' }
+    sequence(:role) { |n| 'goalkeeper' }
+  end
+
+  factory :invalid_player, :parent => :player do |f|
+    f.name nil
   end
 
 end

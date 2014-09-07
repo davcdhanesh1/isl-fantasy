@@ -49,7 +49,7 @@ group :test do
   gem 'capybara'
   gem 'factory_girl_rails'
   gem 'cucumber-rails',  :require => false
-  gem 'faker'
+  gem 'faker', '1.1.2'
 end
 
 # Production deployment to heroku

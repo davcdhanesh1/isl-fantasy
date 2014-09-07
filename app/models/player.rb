@@ -4,6 +4,8 @@ class Player < ActiveRecord::Base
   validates_numericality_of :price, greater_than_or_equal_to: 0
   validates :points, presence: true
   validates_numericality_of :points, greater_than_or_equal_to: 0
-  validates :role, presence: true
+  validates :role, presence: true, length: { minimum: 5, maximum: 16 }
   validates :franchise, presence: true, length: { minimum: 3, maximum: 16 }
+
+  default_scope -> { order('created_at DESC')}
 end

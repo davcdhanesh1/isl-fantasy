@@ -1,0 +1,31 @@
+<%= form_for(@player, url: { action: 'create', controller: 'players', method: :post }) do |f| %>
+
+
+    <% if @player.errors.any? %>
+        <div id="error_explanation">
+          <div class="alert alert-error">
+            Sorry, it contains <%= pluralize(@player.errors.count, "error") %>.
+          </div>
+          <% @player.errors.full_messages.each do |msg| %>
+              * <%= msg %></br>
+          <% end %>
+        </div>
+    <% end %>
+
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+
+    <%= f.label :franchise %>
+    <%= f.text_field :franchise %>
+
+    <%= f.label :role %>
+    <%= f.text_field :role %>
+
+    <%= f.label :points %>
+    <%= f.text_field :points %>
+
+    <%= f.label :price %>
+    <%= f.text_field :price %>
+
+    <%= f.submit "add new player" %>
+<% end %>
