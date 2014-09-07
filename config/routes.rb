@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   root 'static_pages#index'
 
   # Facebook callback uri
-  match '/auth/:provider/callback', to: 'sessions#create', via: 'get'
+  match '/auth/:provider/callback', to: 'sessions#create', via: [:get]
 
   # Facebook auth failure
   match 'auth/failure', to: redirect('/'), via: [:get, :post]
@@ -15,5 +15,7 @@ Rails.application.routes.draw do
 
   # Facebook signout uri
   match '/sign_out', to: 'sessions#destroy', via: 'get'
+
+
 
 end

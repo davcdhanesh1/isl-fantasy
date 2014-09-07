@@ -3,8 +3,8 @@ Hi welcome to Indian soccer league Fantasy league<br>
 
 <% if current_user %>
     signed in as <%= current_user.name %><br>
-    <%= image_tag(current_user.image_url, alt: 'pic unavailaible') %><br>
-    <%= link_to 'sign out', sign_out_path %>
+    <%= image_tag(current_user.image_url + "?width=200", alt: 'pic unavailaible') %><br>
+    <%= link_to 'sign out', sign_out_path, size: "300 * 400" %>
 <% else %>
     <%= link_to 'sign in with facebook', sign_in_path %>
 <% end %>
