@@ -22,7 +22,7 @@
     <%= f.text_field :role %>
 
     <%= f.label :points %>
-    <%= f.text_field :points %>
+    <%= f.number_field :points , min: 0 %>
 
     <%= f.label :price %>
     <%= f.text_field :price %>
