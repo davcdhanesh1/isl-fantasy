@@ -2,7 +2,7 @@ FactoryGirl.define do
 
   factory :player do
     sequence(:name) { |n| "player-#{n}" }
-    sequence(:franchise) { |n| Player::Franchise::FC_PUNE_CITY }
+    sequence(:franchise) { |n| 'test pune franchise' }
     sequence(:price) { |n| '3000' }
     sequence(:points) { |n| 1000 }
     sequence(:role) { |n| 'goalkeeper' }

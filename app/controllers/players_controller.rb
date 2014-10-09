@@ -1,5 +1,5 @@
 class PlayersController < ApplicationController
-
+  before_filter :redirect_back_to_root_path_if_not_admin, only: [:new,:create,:edit,:update]
 
   def index
     @players = Player.paginate(page: params[:page], :per_page => 20)
@@ -36,6 +36,11 @@ class PlayersController < ApplicationController
 
 
   private
+
+  def redirect_back_to_root_path_if_not_admin
+    redirect_to root_path unless is_admin?
+  end
+
   def new_player_params
     params.require(:player).permit(:name, :franchise, :role, :price, :points)
   end
