@@ -10,13 +10,16 @@ RSpec.describe PlayersController, :type => :controller do
 
     describe '#index' do
 
-      it 'should get list of all players' do
-        players = [double(:player), double(:player)]
-        Player.stub(:paginate) { [players] }
+      it 'should get list of all players in descending order of their creation time' do
+        players = [FactoryGirl.create(:player, name: 'Player-1'), FactoryGirl.create(:player, name: 'Player-2')]
 
         get :index
+        all_player_resource = JSON.parse(response.body)
+
         expect(response).to be_success
-        expect(assigns(:players).present?).to eq true
+        expect(all_player_resource.count).to eq players.count
+        expect(all_player_resource[0]['name']).to eq 'Player-2'
+        expect(all_player_resource[1]['name']).to eq 'Player-1'
       end
 
     end
@@ -25,10 +28,18 @@ RSpec.describe PlayersController, :type => :controller do
 
       context 'with valid attributes' do
         it 'should create new player and redirect to all players page' do
-          expect {
-            post :create, player: FactoryGirl.attributes_for(:player)
-          }.to change(Player, :count).by(1)
-          expect(response).to redirect_to(players_path)
+
+          post :create, player: { name: 'player name', franchise: 'player franchise', price: '100', points: 1000,
+                                  role: 'player role' }
+
+          player_resource = JSON(response.body)
+
+          expect(response.status).to eq 201
+          expect(player_resource['name']).to eq 'player name'
+          expect(player_resource['franchise']).to eq 'player franchise'
+          expect(player_resource['price']).to eq '100'
+          expect(player_resource['points']).to eq 1000
+          expect(player_resource['role']).to eq 'player role'
         end
       end
 
@@ -37,45 +48,9 @@ RSpec.describe PlayersController, :type => :controller do
           expect {
             post :create, player: FactoryGirl.attributes_for(:invalid_player)
           }.to change(Player, :count).by(0)
+
+          expect(response.status).to eq 422
         end
-
-        it 'should redirect back to new player' do
-          invalid_player = FactoryGirl.attributes_for(:invalid_player)
-          post :create, player: invalid_player
-          expect(response).to render_template(:new)
-        end
-      end
-
-    end
-
-    describe '#new' do
-
-      it 'should build object for new player ' do
-        get :new
-        expect(response).to be_success
-        expect(assigns(:player).present?).to eq true
-      end
-
-      it 'should render new player template' do
-        get :new
-        expect(response).to render_template(:new)
-      end
-
-    end
-
-    describe '#edit' do
-
-      let(:player) { FactoryGirl.create(:player) }
-
-      it 'should build object for player' do
-        get :edit, id: player.id
-        expect(response).to be_success
-        expect(assigns(:player).present?).to eq true
-      end
-
-      it 'should render edit player template for that player' do
-        get :edit, id: player.id
-        expect(response).to render_template(:edit)
       end
 
     end
@@ -83,65 +58,59 @@ RSpec.describe PlayersController, :type => :controller do
     describe '#update' do
 
       context 'with valid attributes' do
-        it 'should update that player and redirect to all players page' do
-          player = FactoryGirl.create(:player)
+        it 'should update that player and return 200' do
+          player = FactoryGirl.create(:player, name: 'old name', franchise: 'old franchise', price: '10', points: 100,
+                                      role: 'old role')
 
-          put :update, id: player.id, player: FactoryGirl.attributes_for(:player, points: 999, name: 'new name')
+          put :update, id: player.id, player: { name: 'new name', franchise: 'new franchise', price: '100', points: 1000,
+                                 role: 'new role'}
 
-          player.reload
-          expect(player.name).to eq 'new name'
-          expect(player.points).to eq 999
-          expect(response).to redirect_to(players_path)
+          get :show, id: player.id
+          player_resource = JSON(response.body)
+
+          expect(response.status).to eq 200
+          expect(player_resource['name']).to eq 'new name'
+          expect(player_resource['franchise']).to eq 'new franchise'
+          expect(player_resource['price']).to eq '100'
+          expect(player_resource['points']).to eq 1000
+          expect(player_resource['role']).to eq 'new role'
         end
       end
 
       context 'with invalid attributes' do
-        it 'should not update that player and redirect back to edit player page' do
+        it 'should not update that player and return 304' do
           player = FactoryGirl.create(:player)
 
-          put :update, id: player.id, player: FactoryGirl.attributes_for(:player, points: -1)
+          put :update, id: player.id, player: { name: '', franchise: 'new ', price: '100', points: -5,
+                                 role: 'new role'}
 
-          expect(response).to render_template(:edit)
+          expect(response.status).to eq 304
         end
       end
 
     end
 
+    describe '#show' do
+      it 'should get particular player' do
+        first_player = FactoryGirl.create(:player,
+                                          name: 'Test Player',
+                                          franchise: 'Test Franchise',
+                                          price: '100',
+                                          points: '1000',
+                                          role: 'Mid Fielder')
+
+        get :show, id: first_player.id
+
+        expect(response).to be_success
+        player_resource = JSON.parse(response.body)
+
+        expect(player_resource['name']).to eq 'Test Player'
+        expect(player_resource['franchise']).to eq 'Test Franchise'
+        expect(player_resource['price']).to eq '100'
+        expect(player_resource['points']).to eq 1000
+        expect(player_resource['role']).to eq 'Mid Fielder'
+      end
+    end
+
   end
-
-  context 'authentication' do
-
-    before {
-      allow_any_instance_of(ApplicationController).to receive(:is_admin?).and_return(false)
-    }
-
-    describe '#new' do
-      it 'should redirect back to root path if user is not admin' do
-        get :new
-        expect(response).to redirect_to(root_path)
-      end
-    end
-
-    describe '#create' do
-      it 'should redirect back to root path if user not admin' do
-        post :create, player: FactoryGirl.attributes_for(:player)
-        expect(response).to redirect_to(root_path)
-      end
-    end
-
-    describe '#edit' do
-      it 'should redirect back to root path if user not admin' do
-        get :edit, id: :something
-        expect(response).to redirect_to(root_path)
-      end
-    end
-
-    describe '#update' do
-      it 'should redirect back to root path if user not admin' do
-        put :update, id: :something, player: FactoryGirl.attributes_for(:player)
-        expect(response).to redirect_to(root_path)
-      end
-    end
-  end
-
 end

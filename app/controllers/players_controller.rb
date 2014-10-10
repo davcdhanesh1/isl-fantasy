@@ -1,44 +1,43 @@
 class PlayersController < ApplicationController
-  before_filter :redirect_back_to_root_path_if_not_admin, only: [:new,:create,:edit,:update]
+  skip_before_action :verify_authenticity_token, if: :json_request?, only: [:update, :create]
 
   def index
-    @players = Player.paginate(page: params[:page], :per_page => 20)
-  end
+    players = Player.all
 
-  def new
-    @player= Player.new
+    render :json => player_json_response(players)
   end
 
   def create
-    @player = Player.new(new_player_params)
-    if @player.save
-      redirect_to players_path
+    player = Player.new(new_player_params)
+    if player.save
+      render :json => player_json_response(player), status: :created
     else
-      render new_player_path(@player)
+      render :json => player_json_response(player), status: :unprocessable_entity
     end
-  end
-
-  def edit
-    @player = Player.find(params[:id])
   end
 
   def update
-    @player = Player.find(params[:id])
+    player = Player.find(params[:id])
 
-    @player.update(new_player_params)
+    player.update(new_player_params)
 
-    if @player.save
-      redirect_to players_path
+    if player.save
+      render :json => player_json_response(player), status: :ok
     else
-      render :edit
+      render :json => player_json_response(player), status: :not_modified
     end
   end
 
+  def show
+    player = Player.find(params[:id])
+
+    render :json => player_json_response(player)
+  end
 
   private
 
-  def redirect_back_to_root_path_if_not_admin
-    redirect_to root_path unless is_admin?
+  def player_json_response(player)
+    player.to_json(only: [:id, :name, :franchise, :price, :points, :role])
   end
 
   def new_player_params

@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-
   private
   def current_user
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
@@ -12,6 +11,10 @@ class ApplicationController < ActionController::Base
 
   def is_admin?
     current_user && current_user.is_admin == true
+  end
+
+  def json_request?
+    request.format.json?
   end
 
 end

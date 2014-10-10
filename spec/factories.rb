@@ -1,11 +1,11 @@
 FactoryGirl.define do
 
   factory :player do
-    sequence(:name) { |n| "player-#{n}" }
-    sequence(:franchise) { |n| 'test pune franchise' }
-    sequence(:price) { |n| '3000' }
-    sequence(:points) { |n| 1000 }
-    sequence(:role) { |n| 'goalkeeper' }
+    name { 'player-name' }
+    franchise { 'test pune franchise' }
+    price { '3000' }
+    points { 1000 }
+    role { 'goalkeeper' }
   end
 
   factory :invalid_player, :parent => :player do |f|
